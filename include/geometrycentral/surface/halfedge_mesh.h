@@ -116,7 +116,7 @@ public:
   int eulerCharacteristic() const; // compute the Euler characteristic [O(1)]
   int genus() const;               // compute the genus [O(1)]
   size_t nConnectedComponents();   // compute number of connected components [O(n)]
-  void printStatistics() const;    // print info about element counts to std::cout
+  void printStatistics(std::ostream& out = std::cout) const;    // print info about element counts to an output stream
 
   std::vector<std::vector<size_t>> getFaceVertexList();
   std::unique_ptr<HalfedgeMesh> copy() const;

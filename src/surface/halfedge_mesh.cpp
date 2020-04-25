@@ -269,14 +269,14 @@ HalfedgeMesh::~HalfedgeMesh() {
 // ================       Utilities        ==================
 // ==========================================================
 
-void HalfedgeMesh::printStatistics() const {
-  std::cout << "Halfedge mesh with: " << std::endl;
-  std::cout << "    # verts =  " << nVertices() << std::endl;
-  std::cout << "    # edges =  " << nEdges() << std::endl;
-  std::cout << "    # faces =  " << nFaces() << std::endl;
-  std::cout << "    # halfedges =  " << nHalfedges() << "  (" << nInteriorHalfedges() << " interior, "
+void HalfedgeMesh::printStatistics(std::ostream& out) const {
+  out << "Halfedge mesh with: " << std::endl;
+  out << "    # verts =  " << nVertices() << std::endl;
+  out << "    # edges =  " << nEdges() << std::endl;
+  out << "    # faces =  " << nFaces() << std::endl;
+  out << "    # halfedges =  " << nHalfedges() << "  (" << nInteriorHalfedges() << " interior, "
             << nExteriorHalfedges() << " exterior)" << std::endl;
-  std::cout << "      and " << nBoundaryLoops() << " boundary components. " << std::endl;
+  out << "      and " << nBoundaryLoops() << " boundary components. " << std::endl;
 }
 
 bool HalfedgeMesh::isTriangular() {

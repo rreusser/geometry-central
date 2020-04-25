@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <fstream>
+#include <istream>
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
@@ -17,6 +18,7 @@ class PolygonSoupMesh {
 public:
   PolygonSoupMesh();
   PolygonSoupMesh(std::string meshFilename, std::string type = "");
+  PolygonSoupMesh(std::istream& in, std::string type = "");
   PolygonSoupMesh(const std::vector<std::vector<size_t>>& polygons_, const std::vector<Vector3>& vertexCoordinates_);
 
   // Mutate this mesh and by naively triangulating polygons
@@ -32,10 +34,12 @@ public:
   void mergeIdenticalVertices();
 
 private:
-  void readMeshFromObjFile(std::string filename);
-  void readMeshFromStlFile(std::string filename);
-  void readMeshFromAsciiStlFile(std::ifstream& in);
-  void readMeshFromBinaryStlFile(std::ifstream in);
+  void parseInputStream(std::istream& in, std::string type);
+
+  void readMeshFromObjFile(std::istream& in);
+  void readMeshFromStlFile(std::istream& in);
+  void readMeshFromAsciiStlFile(std::istream& in);
+  void readMeshFromBinaryStlFile(std::istream& in);
 };
 
 } // namespace geometrycentral

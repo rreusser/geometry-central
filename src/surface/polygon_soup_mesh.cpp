@@ -11,7 +11,6 @@ namespace geometrycentral {
 PolygonSoupMesh::PolygonSoupMesh() {}
 
 PolygonSoupMesh::PolygonSoupMesh(std::string meshFilename, std::string type) {
-
   // Attempt to detect filename
   bool typeGiven = type != "";
   std::string::size_type sepInd = meshFilename.rfind('.');
@@ -27,9 +26,17 @@ PolygonSoupMesh::PolygonSoupMesh(std::string meshFilename, std::string type) {
   }
 
   if (type == "obj") {
-    readMeshFromObjFile(meshFilename);
+    // Open the file
+    std::ifstream in(meshFilename);
+    if (!in) throw std::invalid_argument("Could not open mesh file " + meshFilename);
+
+    parseInputStream(in, "obj");
   } else if (type == "stl") {
-    readMeshFromStlFile(meshFilename);
+    // Open the file
+    std::ifstream in(meshFilename);
+    if (!in) throw std::invalid_argument("Could not open mesh file " + meshFilename);
+
+    parseInputStream(in, "stl");
   } else {
     if (typeGiven) {
       throw std::runtime_error("Did not recognize mesh file type " + type);
@@ -38,7 +45,21 @@ PolygonSoupMesh::PolygonSoupMesh(std::string meshFilename, std::string type) {
                                type + ", but cannot load this)");
     }
   }
+
 }
+
+PolygonSoupMesh::PolygonSoupMesh(std::istream& in, std::string type) {
+  parseInputStream(in, type);
+}
+
+void PolygonSoupMesh::parseInputStream(std::istream& in, std::string type) {
+  if (type == "obj") {
+    readMeshFromObjFile(in);
+  } else if (type == "stl") {
+    readMeshFromStlFile(in);
+  }
+}
+
 
 PolygonSoupMesh::PolygonSoupMesh(const std::vector<std::vector<size_t>>& polygons_,
                                  const std::vector<Vector3>& vertexCoordinates_)
@@ -100,15 +121,11 @@ Index parseFaceIndex(const std::string& token) {
 }
 
 // Read a .obj file containing a polygon mesh
-void PolygonSoupMesh::readMeshFromObjFile(std::string filename) {
+void PolygonSoupMesh::readMeshFromObjFile(std::istream& in) {
   // std::cout << "Reading mesh from file: " << filename << std::endl;
 
   polygons.clear();
   vertexCoordinates.clear();
-
-  // Open the file
-  std::ifstream in(filename);
-  if (!in) throw std::invalid_argument("Could not open mesh file " + filename);
 
   // parse obj format
   std::string line;
@@ -148,7 +165,7 @@ void PolygonSoupMesh::readMeshFromObjFile(std::string filename) {
 }
 
 // Assumes that first line has already been consumed
-void PolygonSoupMesh::readMeshFromAsciiStlFile(std::ifstream& in) {
+void PolygonSoupMesh::readMeshFromAsciiStlFile(std::istream& in) {
   std::string line;
   std::stringstream ss;
   size_t lineNum = 1;
@@ -222,8 +239,8 @@ void PolygonSoupMesh::readMeshFromAsciiStlFile(std::ifstream& in) {
   }
 }
 
-void PolygonSoupMesh::readMeshFromBinaryStlFile(std::ifstream in) {
-  auto parseVector3 = [&](std::ifstream& in) {
+void PolygonSoupMesh::readMeshFromBinaryStlFile(std::istream& in) {
+  auto parseVector3 = [&](std::istream& in) {
     char buffer[3 * sizeof(float)];
     in.read(buffer, 3 * sizeof(float));
     float* fVec = (float*)buffer;
@@ -260,14 +277,10 @@ void PolygonSoupMesh::readMeshFromBinaryStlFile(std::ifstream in) {
 }
 
 // Read a .stl file containing a polygon mesh
-void PolygonSoupMesh::readMeshFromStlFile(std::string filename) {
+void PolygonSoupMesh::readMeshFromStlFile(std::istream& in) {
   // TODO: read stl file name
   polygons.clear();
   vertexCoordinates.clear();
-
-  // Open the file
-  std::ifstream in(filename);
-  if (!in) throw std::invalid_argument("Could not open mesh file " + filename);
 
   // parse stl format
   std::string line;
@@ -278,7 +291,7 @@ void PolygonSoupMesh::readMeshFromStlFile(std::string filename) {
   if (token == "solid") {
     readMeshFromAsciiStlFile(in);
   } else {
-    readMeshFromBinaryStlFile(std::ifstream(filename, std::ios::in | std::ios::binary));
+    readMeshFromBinaryStlFile(in);
   }
 }
 
